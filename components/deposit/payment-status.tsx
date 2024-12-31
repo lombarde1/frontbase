@@ -5,8 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle, XCircle, ArrowRight } from "lucide-react";
 import type { PaymentStatus } from "@/lib/api/payment/types";
 import { useEffect } from "react";
-// Definir o ID do seu pixel
-const FACEBOOK_PIXEL_ID = '1268307507750910';
 
 interface PaymentStatusProps {
   status: PaymentStatus;
@@ -19,26 +17,8 @@ declare global {
   }
 }
 
-
-
 export function PaymentStatusDisplay({ status, onClose }: PaymentStatusProps) {
 
-  useEffect(() => {
-    // Inicializa o pixel apenas se ele não existir
-    if (!window.fbq) {
-      const script = document.createElement('script');
-      script.async = true;
-      script.src = 'https://connect.facebook.net/en_US/fbevents.js';
-      document.head.appendChild(script);
-
-      script.onload = () => {
-        window.fbq('init', FACEBOOK_PIXEL_ID);
-        window.fbq('track', 'PageView');
-      };
-    }
-  }, []);
-
-  // Rastrear o evento de compra quando o status for completed
   useEffect(() => {
     if (status.status === "completed" && window.fbq) {
       window.fbq('track', 'Purchase', {
