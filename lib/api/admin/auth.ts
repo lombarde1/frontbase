@@ -4,7 +4,7 @@ const ADMIN_TOKEN_KEY = 'adminToken';
 const ADMIN_USERNAME_KEY = 'adminUsername';
 
 export const ADMIN_CREDENTIALS = {
-  username: 'moneymoney',
+  username: 'tropa2025',
   password: 'admincoin'
 };
 
