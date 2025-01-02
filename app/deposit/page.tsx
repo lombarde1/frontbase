@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
@@ -20,6 +20,26 @@ export default function DepositPage() {
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // Track page view
+  useEffect(() => {
+    if (window.utmify) {
+      window.utmify('track', 'page_view', {
+        page: 'deposit',
+        url: window.location.href
+      });
+    }
+  }, []);
+
+  const handleAmountSelect = (value: number) => {
+    setAmount(value);
+    // Track amount selection
+    if (window.utmify) {
+      window.utmify('track', 'amount_selected', {
+        value: value
+      });
+    }
+  };
+
   const handleGeneratePix = async () => {
     if (amount <= 0) {
       toast.error("Selecione um valor para depósito");
@@ -35,9 +55,35 @@ export default function DepositPage() {
       
       setQrCode(qrCode);
       setTransactionId(transactionId);
+
+      // Track PIX generation
+      window.dispatchEvent(new CustomEvent('pix_generated', {
+        detail: {
+          amount: amount,
+          transactionId: transactionId,
+          timestamp: new Date().toISOString()
+        }
+      }));
+
+      // Track in utmify directly
+      if (window.utmify) {
+        window.utmify('track', 'pix_generated', {
+          value: amount,
+          transaction_id: transactionId,
+          currency: 'BRL'
+        });
+      }
     } catch (error) {
       toast.error("Erro ao gerar PIX. Tente novamente.");
       console.error("Error generating PIX:", error);
+      
+      // Track error
+      if (window.utmify) {
+        window.utmify('track', 'pix_generation_error', {
+          error: error instanceof Error ? error.message : 'Unknown error',
+          amount: amount
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -46,23 +92,55 @@ export default function DepositPage() {
   const handlePaymentConfirm = async () => {
     if (!transactionId) return;
 
+    let checkCount = 0;
+    const maxChecks = 60; // 5 minutos (60 * 5 segundos)
+
     const checkInterval = setInterval(async () => {
       try {
+        checkCount++;
         const status = await checkPaymentStatus(transactionId);
         setPaymentStatus(status);
 
-        if (status.status === "completed" || status.status === "failed") {
+        if (status.status === "completed") {
           clearInterval(checkInterval);
+          // Track successful payment
+          if (window.utmify) {
+            window.utmify('track', 'pix_paid', {
+              value: amount,
+              transaction_id: transactionId,
+              currency: 'BRL',
+              time_to_payment: checkCount * 5 // segundos até o pagamento
+            });
+          }
+        } else if (status.status === "failed" || checkCount >= maxChecks) {
+          clearInterval(checkInterval);
+          // Track failed payment
+          if (window.utmify) {
+            window.utmify('track', 'pix_failed', {
+              value: amount,
+              transaction_id: transactionId,
+              reason: status.status === "failed" ? "payment_failed" : "timeout"
+            });
+          }
         }
       } catch (error) {
         console.error("Error checking payment status:", error);
-        clearInterval(checkInterval);
+        // Track error in status check
+        if (window.utmify) {
+          window.utmify('track', 'status_check_error', {
+            transaction_id: transactionId,
+            error: error instanceof Error ? error.message : 'Unknown error'
+          });
+        }
       }
     }, 5000);
 
     // Initial check
     const initialStatus = await checkPaymentStatus(transactionId);
     setPaymentStatus(initialStatus);
+
+    // Cleanup
+    return () => clearInterval(checkInterval);
   };
 
   return (
@@ -72,7 +150,15 @@ export default function DepositPage() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => router.back()}
+            onClick={() => {
+              // Track back button click
+              if (window.utmify) {
+                window.utmify('track', 'deposit_cancelled', {
+                  stage: qrCode ? 'pix_generated' : 'amount_selection'
+                });
+              }
+              router.back();
+            }}
             className="hover:bg-gray-800 text-white"
           >
             <ArrowLeft className="h-6 w-6" />
@@ -88,7 +174,7 @@ export default function DepositPage() {
             
             <AmountSelector
               selectedAmount={amount}
-              onAmountSelect={setAmount}
+              onAmountSelect={handleAmountSelect}
             />
 
             <Button
@@ -102,7 +188,17 @@ export default function DepositPage() {
         ) : paymentStatus ? (
           <PaymentStatusDisplay
             status={paymentStatus}
-            onClose={() => router.push("/dashboard")}
+            onClose={() => {
+              // Track completion
+              if (window.utmify) {
+                window.utmify('track', 'deposit_flow_completed', {
+                  status: paymentStatus.status,
+                  amount: amount,
+                  transaction_id: transactionId
+                });
+              }
+              router.push("/dashboard");
+            }}
           />
         ) : (
           <PixQRCode
