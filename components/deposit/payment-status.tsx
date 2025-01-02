@@ -17,8 +17,31 @@ declare global {
   }
 }
 
-export function PaymentStatusDisplay({ status, onClose }: PaymentStatusProps) {
 
+export function PaymentStatusDisplay({ status, onClose }: PaymentStatusProps) {
+  /*/const trackPayment = (status: PaymentStatus) => {
+    try {
+      if (!window.fbq) return;
+      
+      // Track all payment attempts
+      window.fbq('track', 'InitiatePayment', {
+        value: status.amount,
+        currency: 'BRL',
+        status: status.status
+      });
+  
+      // Track only successful payments
+      if (status.status === "completed") {
+        window.fbq('track', 'Purchase', {
+          value: status.amount,
+          currency: 'BRL',
+        }, {eventID: status.transactionId}); // Deduplicação
+      }
+    } catch (error) {
+      console.error('Error tracking payment:', error);
+    }
+  };
+  
   useEffect(() => {
     if (status.status === "completed" && window.fbq) {
       window.fbq('track', 'Purchase', {
@@ -27,7 +50,7 @@ export function PaymentStatusDisplay({ status, onClose }: PaymentStatusProps) {
       });
     }
   }, [status]);
-
+/*/
   const getStatusDisplay = () => {
     switch (status.status) {
       case "completed":
