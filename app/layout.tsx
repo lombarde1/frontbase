@@ -1,11 +1,13 @@
-// app/layout.tsx
+import './globals.css';
+import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { Toaster } from "sonner";
+import Script from 'next/script';
 import { UtmifyPixel } from '@/components/tracking/utmify-pixel';
 
 const inter = Inter({ subsets: ['latin'] });
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Coinbase - O futuro do dinheiro',
   description: 'Compre, venda e gerencie centenas de criptomoedas de modo simples e seguro',
 };
