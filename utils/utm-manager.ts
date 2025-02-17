@@ -69,15 +69,17 @@ export class UTMManager {
       const urlObj = new URL(url);
       const params = new URLSearchParams(urlObj.search);
 
-      // Adiciona os parâmetros UTM
-      Object.entries(this.utmData).forEach(([key, value]) => {
-        if (key !== 'timestamp' && value) {
-          params.set(key, value);
-        }
-      });
-
-      // Adiciona o IP como parâmetro
+      // Adiciona o IP
       params.set('ip', this.clientIP);
+
+      // Adiciona os parâmetros UTM individualmente
+      if (this.utmData.utm_source) params.set('utm_source', this.utmData.utm_source);
+      if (this.utmData.utm_medium) params.set('utm_medium', this.utmData.utm_medium);
+      if (this.utmData.utm_campaign) params.set('utm_campaign', this.utmData.utm_campaign);
+      if (this.utmData.utm_content) params.set('utm_content', this.utmData.utm_content);
+      if (this.utmData.utm_term) params.set('utm_term', this.utmData.utm_term);
+      if (this.utmData.src) params.set('src', this.utmData.src);
+      if (this.utmData.sck) params.set('sck', this.utmData.sck);
 
       urlObj.search = params.toString();
       return urlObj.toString();
