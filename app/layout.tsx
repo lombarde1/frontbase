@@ -8,7 +8,7 @@ import { UtmifyPixel } from '@/components/tracking/utmify-pixel';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Coinbase - O futuro do dinheiro',
+  title: 'Pico Invest - O futuro do dinheiro',
   description: 'Compre, venda e gerencie centenas de criptomoedas de modo simples e seguro',
 };
 

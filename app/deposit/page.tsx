@@ -32,7 +32,6 @@ export default function DepositPage() {
 
   const handleAmountSelect = (value: number) => {
     setAmount(value);
-    // Track amount selection
     if (window.utmify) {
       window.utmify('track', 'amount_selected', {
         value: value
@@ -50,13 +49,12 @@ export default function DepositPage() {
     try {
       const { qrCode, transactionId } = await generatePix(
         amount,
-        "user@example.com" // TODO: Get user email from context/storage
+        "user@example.com"
       );
       
       setQrCode(qrCode);
       setTransactionId(transactionId);
 
-      // Track PIX generation
       window.dispatchEvent(new CustomEvent('pix_generated', {
         detail: {
           amount: amount,
@@ -65,7 +63,6 @@ export default function DepositPage() {
         }
       }));
 
-      // Track in utmify directly
       if (window.utmify) {
         window.utmify('track', 'pix_generated', {
           value: amount,
@@ -77,7 +74,6 @@ export default function DepositPage() {
       toast.error("Erro ao gerar PIX. Tente novamente.");
       console.error("Error generating PIX:", error);
       
-      // Track error
       if (window.utmify) {
         window.utmify('track', 'pix_generation_error', {
           error: error instanceof Error ? error.message : 'Unknown error',
@@ -144,14 +140,13 @@ export default function DepositPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-gradient-to-br from-zinc-950 to-zinc-900 text-white">
       <div className="max-w-md mx-auto p-4">
         <div className="flex items-center gap-4 mb-6">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => {
-              // Track back button click
               if (window.utmify) {
                 window.utmify('track', 'deposit_cancelled', {
                   stage: qrCode ? 'pix_generated' : 'amount_selection'
@@ -159,7 +154,7 @@ export default function DepositPage() {
               }
               router.back();
             }}
-            className="hover:bg-gray-800 text-white"
+            className="hover:bg-black/20 text-white transition-all duration-300"
           >
             <ArrowLeft className="h-6 w-6" />
           </Button>
@@ -167,29 +162,34 @@ export default function DepositPage() {
         </div>
 
         {!qrCode ? (
-          <Card className="bg-gray-900 p-6 border-gray-800">
-            <h2 className="text-lg font-semibold mb-6 text-white">
-              Adicione saldo em sua carteira
-            </h2>
+          <Card className="bg-gradient-to-br from-zinc-900 to-zinc-800/90 p-6 border-none rounded-2xl relative overflow-hidden">
+            {/* Background Effects */}
+            <div className="absolute top-0 right-0 w-72 h-72 bg-gradient-to-br from-orange-500/10 to-orange-600/5 rounded-full blur-3xl -mr-32 -mt-32" />
+            <div className="absolute bottom-0 left-0 w-56 h-56 bg-gradient-to-tr from-orange-400/10 to-orange-500/5 rounded-full blur-2xl -ml-24 -mb-24" />
             
-            <AmountSelector
-              selectedAmount={amount}
-              onAmountSelect={handleAmountSelect}
-            />
+            <div className="relative z-10">
+              <h2 className="text-xl font-semibold mb-6 text-white">
+                Adicione saldo em sua carteira
+              </h2>
+              
+              <AmountSelector
+                selectedAmount={amount}
+                onAmountSelect={handleAmountSelect}
+              />
 
-            <Button
-              className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white"
-              onClick={handleGeneratePix}
-              disabled={loading || amount <= 0}
-            >
-              {loading ? "Gerando PIX..." : "Continuar"}
-            </Button>
+              <button
+                className="w-full mt-6 bg-orange-500 hover:bg-orange-600 text-white py-3.5 rounded-2xl flex items-center justify-center gap-2 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] font-medium disabled:opacity-50 disabled:hover:scale-100"
+                onClick={handleGeneratePix}
+                disabled={loading || amount <= 0}
+              >
+                {loading ? "Gerando PIX..." : "Continuar"}
+              </button>
+            </div>
           </Card>
         ) : paymentStatus ? (
           <PaymentStatusDisplay
             status={paymentStatus}
             onClose={() => {
-              // Track completion
               if (window.utmify) {
                 window.utmify('track', 'deposit_flow_completed', {
                   status: paymentStatus.status,

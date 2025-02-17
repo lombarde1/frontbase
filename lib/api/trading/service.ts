@@ -1,6 +1,6 @@
 import { getUserId } from '@/lib/auth/storage';
 
-const API_URL = 'https://zcash.evolucaohot.online/api';
+const API_URL = 'http://localhost:8010/api';
 
 export async function buyCrypto(symbol: string, amount: number) {
   const userId = getUserId();

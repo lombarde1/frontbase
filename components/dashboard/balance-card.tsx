@@ -38,7 +38,7 @@ export function BalanceCard() {
       
       <div className="grid grid-cols-2 gap-4">
         <button 
-          className="w-full bg-[#0052FF] hover:bg-[#0040CC] py-3 rounded-xl text-white font-medium transition-colors"
+          className="w-full bg-orange-500 hover:bg-orange-600 py-3.5 rounded-2xl text-white font-medium transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
           onClick={() => router.push('/trading')}
         >
           Comprar

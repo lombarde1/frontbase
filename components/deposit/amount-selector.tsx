@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Wallet, TrendingUp } from "lucide-react";
+import { Wallet, TrendingUp, DollarSign } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -29,53 +29,59 @@ export function AmountSelector({ selectedAmount, onAmountSelect }: AmountSelecto
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Balance Card */}
-      <div className="bg-gradient-to-br from-[#2D5AF7] to-[#4F6EF7] rounded-xl p-6 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl" />
+      <div className="bg-gradient-to-br from-[#FF6B2C] to-[#FF8F50] rounded-3xl p-6 relative overflow-hidden group hover:shadow-lg hover:shadow-orange-500/10 transition-all duration-500">
+        {/* Background Effects */}
+        <div className="absolute top-0 right-0 w-72 h-72 bg-gradient-to-br from-white/20 to-transparent rounded-full blur-3xl -mr-32 -mt-32 group-hover:scale-110 transition-transform duration-700" />
+        <div className="absolute bottom-0 left-0 w-56 h-56 bg-gradient-to-tr from-black/20 to-transparent rounded-full blur-2xl -ml-24 -mb-24 group-hover:scale-110 transition-transform duration-700" />
+        
         <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-white/10 backdrop-blur-xl rounded-xl flex items-center justify-center">
-              <Wallet className="w-6 h-6 text-white" />
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 bg-gradient-to-br from-white/20 to-white/10 backdrop-blur-xl rounded-2xl flex items-center justify-center transform transition-all duration-300 group-hover:scale-105">
+              <Wallet className="w-7 h-7 text-white" />
             </div>
             <div>
-              <p className="text-white/90 text-sm">Saldo Atual</p>
-              <p className="text-xl font-bold text-white">R$ 0,00</p>
+              <p className="text-white/90 text-sm font-medium tracking-wide">Saldo Atual</p>
+              <p className="text-2xl font-bold text-white tracking-tight">R$ 0,00</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Custom Amount Input */}
-      <div className="space-y-2">
-        <label className="text-sm text-white/80">Valor Personalizado</label>
+      <div className="space-y-3">
+        <label className="text-sm text-white/90 font-medium flex items-center gap-2">
+          <DollarSign className="w-4 h-4 text-orange-500" />
+          Valor Personalizado
+        </label>
         <div className="relative">
           <Input
             type="number"
             value={customAmount}
             onChange={(e) => handleCustomAmountChange(e.target.value)}
-            placeholder=""
-            className="pl-8 bg-gray-800/50 border-gray-700 h-12 text-white placeholder-gray-400"
+            placeholder="Digite um valor"
+            className="pl-8 bg-black/20 border-orange-500/20 h-12 text-white placeholder-white/40 rounded-xl focus:border-orange-500/40 transition-all duration-300 hover:bg-black/30"
           />
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/60">R$</span>
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70 font-medium">R$</span>
         </div>
       </div>
 
       {/* Quick Amount Selector */}
-      <div>
-        <div className="flex items-center gap-2 mb-3">
-          <TrendingUp className="w-4 h-4 text-white/60" />
-          <span className="text-sm text-white/80">Valores Sugeridos</span>
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <TrendingUp className="w-4 h-4 text-orange-500" />
+          <span className="text-sm text-white/90 font-medium">Valores Sugeridos</span>
         </div>
         <div className="grid grid-cols-3 gap-3">
           {PRESET_AMOUNTS.map((amount) => (
             <Button
               key={amount}
               variant={selectedAmount === amount ? "default" : "outline"}
-              className={`h-12 relative overflow-hidden ${
+              className={`h-12 relative overflow-hidden rounded-xl transition-all duration-300 ${
                 selectedAmount === amount 
-                  ? "bg-blue-600 hover:bg-blue-700 text-white" 
-                  : "bg-gray-800/50 hover:bg-gray-700/50 border-gray-700 text-white"
+                  ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-orange-500/20" 
+                  : "bg-black/20 hover:bg-black/30 border-orange-500/20 text-white hover:border-orange-500/40"
               }`}
               onClick={() => {
                 onAmountSelect(amount);
@@ -83,17 +89,19 @@ export function AmountSelector({ selectedAmount, onAmountSelect }: AmountSelecto
               }}
             >
               {selectedAmount === amount && (
-                <div className="absolute inset-0 bg-white/10 animate-pulse" />
+                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent animate-shimmer" />
               )}
-              <span className="relative z-10">R$ {amount.toFixed(2)}</span>
+              <span className="relative z-10 font-medium tracking-wide">R$ {amount.toFixed(2)}</span>
             </Button>
           ))}
         </div>
       </div>
-
-      <p className="text-xs text-center text-gray-400">
-        Valor mínimo para depósito: R$ 30,00
-      </p>
+      
+      <div className="relative px-4 py-3 bg-gradient-to-r from-orange-500/10 to-transparent rounded-xl">
+        <p className="text-sm text-center text-white/70 font-medium">
+          Valor mínimo para depósito: <span className="text-white">R$ 30,00</span>
+        </p>
+      </div>
     </div>
   );
 }

@@ -8,7 +8,7 @@ import type {
 } from "./types";
 import { ADMIN_CREDENTIALS } from "./auth";
 
-const API_URL = 'https://zcash.evolucaohot.online/api/admin';
+const API_URL = 'http://localhost:8010/api/admin';
 
 const headers = {
   'Content-Type': 'application/json',

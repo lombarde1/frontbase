@@ -1,7 +1,7 @@
 import { getUserId } from '../auth/storage';
 import { ApiError } from './types';
 
-const API_URL = 'https://zcash.evolucaohot.online/api';
+const API_URL = 'http://localhost:8010/api';
 
 class ApiClient {
   private static instance: ApiClient;

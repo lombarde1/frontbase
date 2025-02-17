@@ -1,6 +1,6 @@
 import { getToken } from './auth';
 
-const API_URL = 'https://zcash.evolucaohot.online/api';
+const API_URL = 'http://localhost:8010/api';
 
 async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
   const token = getToken();

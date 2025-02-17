@@ -26,7 +26,7 @@ export function PortfolioList() {
   if (loading) {
     return <div className="animate-pulse space-y-4">
       {[...Array(5)].map((_, i) => (
-        <div key={i} className="h-20 bg-gray-800 rounded-lg" />
+        <div key={i} className="h-20 bg-black/40 rounded-xl" />
       ))}
     </div>;
   }
@@ -41,7 +41,7 @@ export function PortfolioList() {
           price={data.price}
           change24h={data.variation}
           chartData={[40, 35, 50, 45, 60, 55, 53]}
-          color="#0052FF"
+          color="#FF6B2C" // Mudamos de #0052FF para o tom de laranja moderno
         />
       ))}
     </div>
