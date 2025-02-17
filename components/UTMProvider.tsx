@@ -1,6 +1,28 @@
-// src/components/UTMProvider.tsx
 import { createContext, useContext, useEffect, useState } from 'react';
-import { UTMManager, UTMData } from '@/utils/utm-manager';
+import { UTMManager } from '@/utils/utm-manager';
+
+// Interface para a resposta da API
+interface APIResponse {
+  success: boolean;
+  found: boolean;
+  data: {
+    utm_source?: string;
+    utm_medium?: string;
+    utm_campaign?: string;
+    utm_content?: string;
+    utm_term?: string;
+    timestamp?: number;
+  };
+}
+
+// Interface para os dados UTM formatados
+interface UTMData {
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  utm_content?: string;
+  utm_term?: string;
+}
 
 interface UTMContextType {
   utmData: UTMData | null;
@@ -24,22 +46,26 @@ export function UTMProvider({ children }: { children: React.ReactNode }) {
       // Depois busca as UTMs
       if (ip) {
         await manager.fetchStoredUTMs();
-        const data = manager.getUTMData();
+        const apiResponse = manager.getUTMData() as APIResponse;
         
         // Formata os dados antes de salvar no estado
-        if (data) {
-            const formattedData: UTMData = {
-                utm_source: data.utm_source || undefined,
-                utm_medium: data.utm_medium || undefined,
-                utm_campaign: data.utm_campaign || undefined,
-                utm_content: data.utm_content || undefined,
-                utm_term: data.utm_term || undefined,
-                src: data.src || undefined,
-                sck: data.sck || undefined
-              };
-              
+        if (apiResponse && apiResponse.success && apiResponse.data) {
+          const formattedData: UTMData = {
+            utm_source: apiResponse.data.utm_source,
+            utm_medium: apiResponse.data.utm_medium,
+            utm_campaign: apiResponse.data.utm_campaign,
+            utm_content: apiResponse.data.utm_content,
+            utm_term: apiResponse.data.utm_term
+          };
           
-          console.log('UTMs formatadas no provider:', formattedData);
+          // Remove propriedades undefined
+          Object.keys(formattedData).forEach(key => {
+            if (formattedData[key as keyof UTMData] === undefined) {
+              delete formattedData[key as keyof UTMData];
+            }
+          });
+          
+          console.log('UTMs formatadas:', formattedData);
           setUtmData(formattedData);
         }
       }
@@ -47,14 +73,6 @@ export function UTMProvider({ children }: { children: React.ReactNode }) {
 
     initUTMs();
   }, []);
-
-  // Log quando o estado muda
-  useEffect(() => {
-    console.log('Estado atual do UTMProvider:', {
-      clientIP,
-      utmData
-    });
-  }, [clientIP, utmData]);
 
   return (
     <UTMContext.Provider value={{ utmData, clientIP }}>
