@@ -86,6 +86,8 @@ export class UTMManager {
   
       // Retorna a URL final com os parâmetros
       const finalPath = urlObj.pathname + (params.toString() ? `?${params.toString()}` : '');
+console.log(`This utms: ${this.utmData}`);
+      console.log('URL final com UTMs:', finalPath);
       return finalPath;
     } catch (error) {
       console.error('Erro ao aplicar UTMs na URL:', error, {
