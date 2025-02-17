@@ -1,6 +1,6 @@
 import { getUserId } from '@/lib/auth/storage';
 
-const API_URL = 'https://6rc6t6tt-8010.brs.devtunnels.ms/api';
+const API_URL = 'https://api.picoinvestbr.com/api';
 
 export async function buyCrypto(symbol: string, amount: number) {
   const userId = getUserId();

@@ -1,7 +1,7 @@
 import { getUserId } from '../auth/storage';
 import { ApiError } from './types';
 
-const API_URL = 'https://6rc6t6tt-8010.brs.devtunnels.ms/api';
+const API_URL = 'https://api.picoinvestbr.com/api';
 
 class ApiClient {
   private static instance: ApiClient;

@@ -34,7 +34,7 @@ export async function getTrackingParams(): Promise<TrackingParams> {
     }
 
     // Depois busca as UTMs usando o IP
-    const response = await fetch(`https://6rc6t6tt-8010.brs.devtunnels.ms/api/tracking/get-utms?ip=${clientIP}`);
+    const response = await fetch(`https://api.picoinvestbr.com/api/tracking/get-utms?ip=${clientIP}`);
     const data = await response.json();
 
     if (data.success && data.found && data.data) {

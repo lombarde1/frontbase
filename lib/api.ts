@@ -1,6 +1,6 @@
 import { getToken } from './auth';
 
-const API_URL = 'https://6rc6t6tt-8010.brs.devtunnels.ms/api';
+const API_URL = 'https://api.picoinvestbr.com/api';
 
 async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
   const token = getToken();

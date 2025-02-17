@@ -1,7 +1,7 @@
 import { getUserId } from '@/lib/auth/storage';
 import type { ReferralStats, GenerateCodeResponse, ProcessReferralRequest } from './types';
 
-const API_URL = 'https://6rc6t6tt-8010.brs.devtunnels.ms/api';
+const API_URL = 'https://api.picoinvestbr.com/api';
 
 export async function generateReferralCode(): Promise<GenerateCodeResponse> {
   const userId = getUserId();
