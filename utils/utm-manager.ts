@@ -64,39 +64,35 @@ export class UTMManager {
 
   applyUTMsToURL(url: string): string {
     try {
-      const urlObj = new URL(url);
+      const urlObj = new URL(url.startsWith('http') ? url : `${window.location.origin}${url}`);
       const params = new URLSearchParams(urlObj.search);
-
+  
       // Adiciona o IP apenas se estiver disponível
       if (this.clientIP) {
         params.set('ip', this.clientIP);
       }
-
-      // Adiciona os parâmetros UTM apenas se existirem e forem válidos
+  
+      // Se temos dados de UTM da API, vamos adicioná-los individualmente
       if (this.utmData) {
-        const utmParams = {
-          utm_source: this.utmData.utm_source,
-          utm_medium: this.utmData.utm_medium,
-          utm_campaign: this.utmData.utm_campaign,
-          utm_content: this.utmData.utm_content,
-          utm_term: this.utmData.utm_term,
-          src: this.utmData.src,
-          sck: this.utmData.sck
-        };
-
-        // Adiciona apenas os parâmetros que existem e têm valor
-        Object.entries(utmParams).forEach(([key, value]) => {
-          if (value && typeof value === 'string') {
-            params.set(key, value);
-          }
-        });
+        // Adicionamos apenas os parâmetros que existem na resposta da API
+        if (this.utmData.utm_source) params.set('utm_source', String(this.utmData.utm_source));
+        if (this.utmData.utm_medium) params.set('utm_medium', String(this.utmData.utm_medium));
+        if (this.utmData.utm_campaign) params.set('utm_campaign', String(this.utmData.utm_campaign));
+        if (this.utmData.utm_content) params.set('utm_content', String(this.utmData.utm_content));
+        if (this.utmData.utm_term) params.set('utm_term', String(this.utmData.utm_term));
+        if (this.utmData.src) params.set('src', String(this.utmData.src));
+        if (this.utmData.sck) params.set('sck', String(this.utmData.sck));
       }
-
-      // Constrói a URL final
-      urlObj.search = params.toString();
-      return urlObj.toString();
+  
+      // Retorna a URL final com os parâmetros
+      const finalPath = urlObj.pathname + (params.toString() ? `?${params.toString()}` : '');
+      return finalPath;
     } catch (error) {
-      console.error('Erro ao aplicar UTMs na URL:', error);
+      console.error('Erro ao aplicar UTMs na URL:', error, {
+        url,
+        utmData: this.utmData,
+        clientIP: this.clientIP
+      });
       return url;
     }
   }
