@@ -2,23 +2,37 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { UTMManager, UTMData } from '@/utils/utm-manager';
 
-const UTMContext = createContext<UTMData | null>(null);
+interface UTMContextType {
+  utmData: UTMData | null;
+  clientIP: string | null;
+}
+
+const UTMContext = createContext<UTMContextType>({ utmData: null, clientIP: null });
 
 export function UTMProvider({ children }: { children: React.ReactNode }) {
   const [utmData, setUtmData] = useState<UTMData | null>(null);
+  const [clientIP, setClientIP] = useState<string | null>(null);
 
   useEffect(() => {
     const initUTMs = async () => {
       const manager = UTMManager.getInstance();
-      await manager.fetchStoredUTMs();
-      setUtmData(manager.getUTMData());
+      
+      // Primeiro obtém o IP
+      const ip = await manager.getClientIP();
+      setClientIP(ip);
+
+      // Depois busca as UTMs
+      if (ip) {
+        await manager.fetchStoredUTMs();
+        setUtmData(manager.getUTMData());
+      }
     };
 
     initUTMs();
   }, []);
 
   return (
-    <UTMContext.Provider value={utmData}>
+    <UTMContext.Provider value={{ utmData, clientIP }}>
       {children}
     </UTMContext.Provider>
   );

@@ -1,5 +1,4 @@
 // src/utils/utm-manager.ts
-
 export interface UTMData {
   utm_source?: string;
   utm_medium?: string;
@@ -14,6 +13,7 @@ export interface UTMData {
 export class UTMManager {
   private static instance: UTMManager;
   private utmData: UTMData | null = null;
+  private clientIP: string | null = null;
   private baseUrl = 'https://6rc6t6tt-8010.brs.devtunnels.ms';
 
   private constructor() {}
@@ -25,9 +25,26 @@ export class UTMManager {
     return UTMManager.instance;
   }
 
+  async getClientIP(): Promise<string | null> {
+    if (this.clientIP) return this.clientIP;
+
+    try {
+      const response = await fetch('https://api.ipify.org?format=json');
+      const data = await response.json();
+      this.clientIP = data.ip;
+      return this.clientIP;
+    } catch (error) {
+      console.error('Erro ao obter IP:', error);
+      return null;
+    }
+  }
+
   async fetchStoredUTMs(): Promise<boolean> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/tracking/get-utms`);
+      const clientIP = await this.getClientIP();
+      if (!clientIP) return false;
+
+      const response = await fetch(`${this.baseUrl}/api/tracking/get-utms?ip=${clientIP}`);
       const data = await response.json();
 
       if (data.found && data.data) {
@@ -46,29 +63,35 @@ export class UTMManager {
   }
 
   applyUTMsToURL(url: string): string {
-    if (!this.utmData) return url;
+    if (!this.utmData || !this.clientIP) return url;
 
     try {
       const urlObj = new URL(url);
       const params = new URLSearchParams(urlObj.search);
 
-      // Adiciona os parâmetros UTM apenas se não existirem na URL
+      // Adiciona os parâmetros UTM
       Object.entries(this.utmData).forEach(([key, value]) => {
-        if (key !== 'timestamp' && value && !params.has(key)) {
+        if (key !== 'timestamp' && value) {
           params.set(key, value);
         }
       });
 
+      // Adiciona o IP como parâmetro
+      params.set('ip', this.clientIP);
+
       urlObj.search = params.toString();
       return urlObj.toString();
     } catch {
-      // Se a URL for inválida, retorna a original
       return url;
     }
   }
 
   getUTMData(): UTMData | null {
     return this.utmData;
+  }
+
+  getIP(): string | null {
+    return this.clientIP;
   }
 }
 
@@ -77,10 +100,14 @@ import { useEffect, useState } from 'react';
 
 export function useUTMs() {
   const [utms, setUtms] = useState<UTMData | null>(null);
+  const [clientIP, setClientIP] = useState<string | null>(null);
 
   useEffect(() => {
     const loadUTMs = async () => {
       const manager = UTMManager.getInstance();
+      const ip = await manager.getClientIP();
+      setClientIP(ip);
+      
       await manager.fetchStoredUTMs();
       setUtms(manager.getUTMData());
     };
@@ -88,5 +115,5 @@ export function useUTMs() {
     loadUTMs();
   }, []);
 
-  return utms;
+  return { utms, clientIP };
 }
