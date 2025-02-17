@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { CircleDollarSign, ArrowUpRight, ArrowDownRight, Users, Wallet, ArrowDown } from "lucide-react";
 import { WithdrawModal } from "@/components/withdraw/withdraw-modal";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { toast } from "sonner";
+import { useUTMNavigation } from '@/hooks/useUTMNavigation';
 
 const actions = [
   { 
@@ -55,7 +54,7 @@ const actions = [
 ];
 
 export function QuickActions() {
-  const router = useRouter();
+  const { navigateWithUTMs } = useUTMNavigation();
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [showRestrictionDialog, setShowRestrictionDialog] = useState(false);
   const [restrictionMessage, setRestrictionMessage] = useState("");
@@ -67,7 +66,8 @@ export function QuickActions() {
       setRestrictionMessage(action.message || "");
       setShowRestrictionDialog(true);
     } else if (action.path) {
-      router.push(action.path);
+      // Usa a navegação com UTMs em vez do router.push
+      navigateWithUTMs(action.path);
     }
   };
 

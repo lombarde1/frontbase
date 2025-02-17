@@ -7,8 +7,13 @@ import { persistTrackingParams } from '@/services/tracking';
 
 export function UtmifyPixel() {
   useEffect(() => {
-    // Persiste parâmetros UTM na sessão
-    persistTrackingParams();
+    // Função assíncrona para inicializar o tracking
+    const initializeTracking = async () => {
+      // Persiste parâmetros UTM na sessão
+      await persistTrackingParams();
+    };
+
+    initializeTracking();
 
     // Adiciona listener para eventos de conversão personalizados
     const handlePixGenerated = (detail: any) => {
@@ -39,9 +44,11 @@ export function UtmifyPixel() {
   }, []);
 
   return (
+
+
     <Script id="utmify-pixel" strategy="afterInteractive">
       {`
-        window.pixelId = "677688e0527f11f5cbca2100";
+        window.pixelId = "67b2d45f34f33f281dd438b4";
         var a = document.createElement("script");
         a.setAttribute("async", "");
         a.setAttribute("defer", "");

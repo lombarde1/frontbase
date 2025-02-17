@@ -1,9 +1,11 @@
+// app/layout.tsx
 import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { Toaster } from "sonner";
-import Script from 'next/script';
 import { UtmifyPixel } from '@/components/tracking/utmify-pixel';
+import { UtmifyScript } from '@/components/tracking/UtmifyScript';
+import ClientLayout from './ClientLayout';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -23,8 +25,11 @@ export default function RootLayout({
         <UtmifyPixel />
       </head>
       <body className={inter.className}>
-        {children}
-        <Toaster richColors position="top-right" />
+        <ClientLayout>
+          {children}
+          <UtmifyScript />
+          <Toaster richColors position="top-right" />
+        </ClientLayout>
       </body>
     </html>
   );

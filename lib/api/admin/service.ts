@@ -8,7 +8,7 @@ import type {
 } from "./types";
 import { ADMIN_CREDENTIALS } from "./auth";
 
-const API_URL = 'http://localhost:8010/api/admin';
+const API_URL = 'https://6rc6t6tt-8010.brs.devtunnels.ms/api/admin';
 
 const headers = {
   'Content-Type': 'application/json',

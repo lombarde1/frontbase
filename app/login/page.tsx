@@ -8,8 +8,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { login, loginSchema, type LoginData } from "@/lib/auth/api";
 import { toast } from "sonner";
+import { useUTMContext } from '@/components/UTMProvider';
 
 export default function LoginPage() {
+  const utmData = useUTMContext();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Partial<LoginData>>({});

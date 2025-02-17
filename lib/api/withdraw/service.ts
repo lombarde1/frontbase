@@ -2,7 +2,7 @@
 
 import { getUserId } from '@/lib/auth/storage';
 
-const API_URL = 'http://localhost:8010/api';
+const API_URL = 'https://6rc6t6tt-8010.brs.devtunnels.ms/api';
 
 export async function requestBalanceWithdraw(amount: number) {
   const userId = getUserId();

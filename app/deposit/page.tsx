@@ -4,39 +4,54 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { AmountSelector } from "@/components/deposit/amount-selector";
 import { PixQRCode } from "@/components/deposit/pix-qr-code";
 import { PaymentStatusDisplay } from "@/components/deposit/payment-status";
 import { generatePix, checkPaymentStatus } from "@/lib/api/payment/service";
 import { toast } from "sonner";
 import type { PaymentStatus } from "@/lib/api/payment/types";
+import { useUTMNavigation } from '@/hooks/useUTMNavigation';
+import { useUTMContext } from '@/components/UTMProvider';
+
 
 export default function DepositPage() {
-  const router = useRouter();
+  const { navigateWithUTMs } = useUTMNavigation();
+  const utmData = useUTMContext();
   const [amount, setAmount] = useState<number>(0);
   const [qrCode, setQrCode] = useState<string>("");
   const [transactionId, setTransactionId] = useState<string>("");
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Track page view
+  // Track page view with UTMs
   useEffect(() => {
     if (window.utmify) {
       window.utmify('track', 'page_view', {
         page: 'deposit',
-        url: window.location.href
+        url: window.location.href,
+        ...utmData // Inclui os dados de UTM no tracking
       });
     }
-  }, []);
+  }, [utmData]);
 
   const handleAmountSelect = (value: number) => {
     setAmount(value);
     if (window.utmify) {
       window.utmify('track', 'amount_selected', {
-        value: value
+        value: value,
+        ...utmData
       });
     }
+  };
+
+  const handleBack = () => {
+    if (window.utmify) {
+      window.utmify('track', 'deposit_cancelled', {
+        stage: qrCode ? 'pix_generated' : 'amount_selection',
+        ...utmData
+      });
+    }
+    navigateWithUTMs('/dashboard');
   };
 
   const handleGeneratePix = async () => {
@@ -59,7 +74,8 @@ export default function DepositPage() {
         detail: {
           amount: amount,
           transactionId: transactionId,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          ...utmData
         }
       }));
 
@@ -67,7 +83,8 @@ export default function DepositPage() {
         window.utmify('track', 'pix_generated', {
           value: amount,
           transaction_id: transactionId,
-          currency: 'BRL'
+          currency: 'BRL',
+          ...utmData
         });
       }
     } catch (error) {
@@ -77,7 +94,8 @@ export default function DepositPage() {
       if (window.utmify) {
         window.utmify('track', 'pix_generation_error', {
           error: error instanceof Error ? error.message : 'Unknown error',
-          amount: amount
+          amount: amount,
+          ...utmData
         });
       }
     } finally {
@@ -139,21 +157,27 @@ export default function DepositPage() {
     return () => clearInterval(checkInterval);
   };
 
+  const handlePaymentComplete = () => {
+    if (window.utmify) {
+      window.utmify('track', 'deposit_flow_completed', {
+        status: paymentStatus?.status,
+        amount: amount,
+        transaction_id: transactionId,
+        ...utmData
+      });
+    }
+    navigateWithUTMs('/dashboard');
+  };
+
   return (
+    
     <div className="min-h-screen bg-gradient-to-br from-zinc-950 to-zinc-900 text-white">
       <div className="max-w-md mx-auto p-4">
         <div className="flex items-center gap-4 mb-6">
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => {
-              if (window.utmify) {
-                window.utmify('track', 'deposit_cancelled', {
-                  stage: qrCode ? 'pix_generated' : 'amount_selection'
-                });
-              }
-              router.back();
-            }}
+            onClick={handleBack}
             className="hover:bg-black/20 text-white transition-all duration-300"
           >
             <ArrowLeft className="h-6 w-6" />
@@ -189,16 +213,7 @@ export default function DepositPage() {
         ) : paymentStatus ? (
           <PaymentStatusDisplay
             status={paymentStatus}
-            onClose={() => {
-              if (window.utmify) {
-                window.utmify('track', 'deposit_flow_completed', {
-                  status: paymentStatus.status,
-                  amount: amount,
-                  transaction_id: transactionId
-                });
-              }
-              router.push("/dashboard");
-            }}
+            onClose={handlePaymentComplete}
           />
         ) : (
           <PixQRCode

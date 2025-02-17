@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { CircleDollarSign, ArrowUpRight, ArrowDownRight, Building, CreditCard, Percent, Wallet, Calendar } from "lucide-react";
+import { UTMLink } from '@/components/UTMLink';
 
 const features = [
   { icon: <CircleDollarSign className="h-6 w-6" />, label: "Comprar" },
@@ -16,6 +17,7 @@ const features = [
 ];
 
 export default function Home() {
+
   return (
     <main className="min-h-screen bg-black text-white">
       {/* Hero Section */}
@@ -54,28 +56,28 @@ export default function Home() {
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/register">
+          <UTMLink href="/register">
             <Button className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 text-lg rounded-full">
               Inscreva-se
             </Button>
-          </Link>
-          <Link href="/login">
+          </UTMLink>
+          <UTMLink href="/login">
             <Button 
               variant="outline" 
               className="w-full sm:w-auto px-8 py-6 text-lg text-gray-800 bg-white hover:bg-gray-100 rounded-full"
             >
               Entrar
             </Button>
-          </Link>
+          </UTMLink>
         </div>
       </div>
 
       {/* Footer */}
       <footer className="border-t border-gray-800 mt-16">
         <div className="max-w-6xl mx-auto px-4 py-6 text-center text-gray-400">
-          <Link href="/terms" className="hover:text-white">Termos</Link>
+          <UTMLink href="/terms" className="hover:text-white">Termos</UTMLink>
           <span className="mx-2">|</span>
-          <Link href="/privacy" className="hover:text-white">Privacidade</Link>
+          <UTMLink href="/privacy" className="hover:text-white">Privacidade</UTMLink>
         </div>
       </footer>
     </main>
