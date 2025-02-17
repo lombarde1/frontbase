@@ -1,4 +1,3 @@
-// components/UTMLink.tsx
 'use client';
 
 import Link from 'next/link';
@@ -24,23 +23,21 @@ export function UTMLink({ href, children, ...props }: UTMLinkProps) {
         params.set('ip', clientIP);
       }
 
-      // Adiciona os UTMs se disponíveis
+      // Adiciona UTMs dinamicamente
       if (utmData) {
-        if (utmData.utm_source) params.set('utm_source', String(utmData.utm_source));
-        if (utmData.utm_medium) params.set('utm_medium', String(utmData.utm_medium));
-        if (utmData.utm_campaign) params.set('utm_campaign', String(utmData.utm_campaign));
-        if (utmData.utm_content) params.set('utm_content', String(utmData.utm_content));
-        if (utmData.utm_term) params.set('utm_term', String(utmData.utm_term));
-        if (utmData.src) params.set('src', String(utmData.src));
-        if (utmData.sck) params.set('sck', String(utmData.sck));
+        Object.entries(utmData).forEach(([key, value]) => {
+          if (value) params.set(key, String(value));
+        });
       }
-console.log(`utmData utms: ${utmData}`);
-console.log(params.toString());
-console.log(params)
-      console.log('URL final com UTMs:', urlObj.toString());
-      // Retorna a URL final
-      const finalPath = urlObj.pathname + (params.toString() ? `?${params.toString()}` : '');
-      return url.startsWith('http') ? urlObj.toString() : finalPath;
+
+      console.log('utmData utms:', JSON.stringify(utmData, null, 2));
+      console.log('Parâmetros formatados:', params.toString());
+
+      // Atualiza a URL com os parâmetros
+      urlObj.search = params.toString();
+      console.log('URL final com UTMs:', urlObj.href);
+
+      return urlObj.href;
     } catch (error) {
       console.error('Erro ao adicionar UTMs na URL:', error);
       return url;
