@@ -5,14 +5,12 @@ export interface UTMData {
   utm_campaign?: string;
   utm_content?: string;
   utm_term?: string;
-  src?: string;
-  sck?: string;
   timestamp?: number;
 }
 
 export class UTMManager {
   private static instance: UTMManager;
-  private utmData: UTMData | null = null;
+  private utmData: any = null;
   private clientIP: string | null = null;
   private baseUrl = 'https://6rc6t6tt-8010.brs.devtunnels.ms';
 
@@ -46,14 +44,16 @@ export class UTMManager {
 
       const response = await fetch(`${this.baseUrl}/api/tracking/get-utms?ip=${clientIP}`);
       const data = await response.json();
+      console.log('Resposta bruta da API:', data);
 
-      if (data.found && data.data) {
-        // Verifica se os dados não estão expirados (24 horas)
-        const now = Date.now();
-        if (now - data.data.timestamp < 24 * 60 * 60 * 1000) {
-          this.utmData = data.data;
-          return true;
-        }
+      if (data.success && data.data) {
+        this.utmData = {
+          utm_source: data.data.utm_source,
+          utm_medium: data.data.utm_medium,
+          timestamp: data.data.timestamp
+        };
+        console.log('UTMs salvas no manager:', this.utmData);
+        return true;
       }
       return false;
     } catch (error) {
@@ -62,71 +62,11 @@ export class UTMManager {
     }
   }
 
-  applyUTMsToURL(url: string): string {
-    try {
-      const urlObj = new URL(url.startsWith('http') ? url : `${window.location.origin}${url}`);
-      const params = new URLSearchParams(urlObj.search);
-  
-      // Adiciona o IP apenas se estiver disponível
-      if (this.clientIP) {
-        params.set('ip', this.clientIP);
-      }
-  
-      // Se temos dados de UTM da API, vamos adicioná-los individualmente
-      if (this.utmData) {
-        // Adicionamos apenas os parâmetros que existem na resposta da API
-        if (this.utmData.utm_source) params.set('utm_source', String(this.utmData.utm_source));
-        if (this.utmData.utm_medium) params.set('utm_medium', String(this.utmData.utm_medium));
-        if (this.utmData.utm_campaign) params.set('utm_campaign', String(this.utmData.utm_campaign));
-        if (this.utmData.utm_content) params.set('utm_content', String(this.utmData.utm_content));
-        if (this.utmData.utm_term) params.set('utm_term', String(this.utmData.utm_term));
-        if (this.utmData.src) params.set('src', String(this.utmData.src));
-        if (this.utmData.sck) params.set('sck', String(this.utmData.sck));
-      }
-  
-      // Retorna a URL final com os parâmetros
-      const finalPath = urlObj.pathname + (params.toString() ? `?${params.toString()}` : '');
-console.log(`This utms: ${this.utmData}`);
-      console.log('URL final com UTMs:', finalPath);
-      return finalPath;
-    } catch (error) {
-      console.error('Erro ao aplicar UTMs na URL:', error, {
-        url,
-        utmData: this.utmData,
-        clientIP: this.clientIP
-      });
-      return url;
-    }
-  }
-
-  getUTMData(): UTMData | null {
+  getUTMData(): any {
     return this.utmData;
   }
 
   getIP(): string | null {
     return this.clientIP;
   }
-}
-
-// Hook personalizado para usar o UTMManager
-import { useEffect, useState } from 'react';
-
-export function useUTMs() {
-  const [utms, setUtms] = useState<UTMData | null>(null);
-  const [clientIP, setClientIP] = useState<string | null>(null);
-
-  useEffect(() => {
-    const loadUTMs = async () => {
-      const manager = UTMManager.getInstance();
-      const ip = await manager.getClientIP();
-      setClientIP(ip);
-      
-      await manager.fetchStoredUTMs();
-      setUtms(manager.getUTMData());
-    };
-
-    loadUTMs();
-  }, []);
-
-  return { utms, clientIP };
 }

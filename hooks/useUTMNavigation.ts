@@ -6,35 +6,35 @@ import { useUTMContext } from '@/components/UTMProvider';
 
 export function useUTMNavigation() {
   const router = useRouter();
-  const utmData = useUTMContext();
+  const { utmData } = useUTMContext();
 
-  const navigateWithUTMs = (url: string) => {
+  const navigateWithUTMs = (path: string) => {
     try {
-      // Criar uma URL base
-      const baseUrl = url.startsWith('http') ? url : `${window.location.origin}${url}`;
-      const urlObj = new URL(baseUrl);
+      const url = new URL(path.startsWith('http') ? path : `${window.location.origin}${path}`);
       
-      // Criar um novo objeto URLSearchParams com os parâmetros existentes
-      const params = new URLSearchParams(urlObj.search);
-
-      // Adicionar ou atualizar os parâmetros UTM
+      // Adiciona UTMs se existirem
       if (utmData) {
-        Object.entries(utmData).forEach(([key, value]) => {
-          if (key !== 'timestamp' && value) {
-            params.set(key, value.toString());
+        const utmParams = [
+          'utm_source',
+          'utm_medium',
+          'utm_campaign',
+          'utm_content',
+          'utm_term',
+          'src',
+          'sck'
+        ];
+
+        utmParams.forEach(param => {
+          if (utmData[param]) {
+            url.searchParams.set(param, utmData[param]);
           }
         });
       }
 
-      // Construir a URL final
-      const queryString = params.toString();
-      const finalPath = `${urlObj.pathname}${queryString ? `?${queryString}` : ''}`;
-
-      // Navegar para a URL final
-      router.push(finalPath);
+      router.push(url.pathname + url.search);
     } catch (error) {
-      console.error('Erro na navegação:', error);
-      router.push(url);
+      console.error('Erro ao navegar com UTMs:', error);
+      router.push(path);
     }
   };
 

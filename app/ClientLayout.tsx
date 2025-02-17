@@ -1,7 +1,7 @@
-// app/ClientLayout.tsx
 'use client';
 
 import { UTMProvider } from '@/components/UTMProvider';
+import { UtmifyScript } from '@/components/tracking/UtmifyScript';
 
 export default function ClientLayout({
   children,
@@ -10,6 +10,7 @@ export default function ClientLayout({
 }) {
   return (
     <UTMProvider>
+      <UtmifyScript />
       {children}
     </UTMProvider>
   );
