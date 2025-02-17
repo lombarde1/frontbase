@@ -20,7 +20,7 @@ async function getClientIP(): Promise<string | null> {
     return null;
   }
 }
-
+//
 // Função para buscar UTMs da API
 export async function getTrackingParams(): Promise<TrackingParams> {
   if (typeof window === 'undefined') return {};
