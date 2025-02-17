@@ -34,7 +34,8 @@ export function UTMLink({ href, children, ...props }: UTMLinkProps) {
         if (utmData.src) params.set('src', String(utmData.src));
         if (utmData.sck) params.set('sck', String(utmData.sck));
       }
-
+console.log(`utmData utms: ${utmData}`);
+      console.log('URL final com UTMs:', urlObj.toString());
       // Retorna a URL final
       const finalPath = urlObj.pathname + (params.toString() ? `?${params.toString()}` : '');
       return url.startsWith('http') ? urlObj.toString() : finalPath;
