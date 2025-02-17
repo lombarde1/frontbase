@@ -12,25 +12,34 @@ interface UTMLinkProps {
 }
 
 export function UTMLink({ href, children, ...props }: UTMLinkProps) {
-  const utmData = useUTMContext();
+  const { utmData, clientIP } = useUTMContext();
 
-  // Adiciona UTMs à URL
   const getUrlWithUTMs = (url: string) => {
     try {
       const urlObj = new URL(url.startsWith('http') ? url : `${window.location.origin}${url}`);
       const params = new URLSearchParams(urlObj.search);
 
-      if (utmData) {
-        Object.entries(utmData).forEach(([key, value]) => {
-          if (key !== 'timestamp' && value && !params.has(key)) {
-            params.set(key, value);
-          }
-        });
+      // Adiciona o IP se disponível
+      if (clientIP) {
+        params.set('ip', clientIP);
       }
 
-      urlObj.search = params.toString();
-      return url.startsWith('http') ? urlObj.toString() : `${urlObj.pathname}${urlObj.search}`;
-    } catch {
+      // Adiciona os UTMs se disponíveis
+      if (utmData) {
+        if (utmData.utm_source) params.set('utm_source', String(utmData.utm_source));
+        if (utmData.utm_medium) params.set('utm_medium', String(utmData.utm_medium));
+        if (utmData.utm_campaign) params.set('utm_campaign', String(utmData.utm_campaign));
+        if (utmData.utm_content) params.set('utm_content', String(utmData.utm_content));
+        if (utmData.utm_term) params.set('utm_term', String(utmData.utm_term));
+        if (utmData.src) params.set('src', String(utmData.src));
+        if (utmData.sck) params.set('sck', String(utmData.sck));
+      }
+
+      // Retorna a URL final
+      const finalPath = urlObj.pathname + (params.toString() ? `?${params.toString()}` : '');
+      return url.startsWith('http') ? urlObj.toString() : finalPath;
+    } catch (error) {
+      console.error('Erro ao adicionar UTMs na URL:', error);
       return url;
     }
   };
