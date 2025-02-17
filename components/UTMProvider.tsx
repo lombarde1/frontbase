@@ -24,12 +24,37 @@ export function UTMProvider({ children }: { children: React.ReactNode }) {
       // Depois busca as UTMs
       if (ip) {
         await manager.fetchStoredUTMs();
-        setUtmData(manager.getUTMData());
+        const data = manager.getUTMData();
+        
+        // Formata os dados antes de salvar no estado
+        if (data) {
+            const formattedData: UTMData = {
+                utm_source: data.utm_source || undefined,
+                utm_medium: data.utm_medium || undefined,
+                utm_campaign: data.utm_campaign || undefined,
+                utm_content: data.utm_content || undefined,
+                utm_term: data.utm_term || undefined,
+                src: data.src || undefined,
+                sck: data.sck || undefined
+              };
+              
+          
+          console.log('UTMs formatadas no provider:', formattedData);
+          setUtmData(formattedData);
+        }
       }
     };
 
     initUTMs();
   }, []);
+
+  // Log quando o estado muda
+  useEffect(() => {
+    console.log('Estado atual do UTMProvider:', {
+      clientIP,
+      utmData
+    });
+  }, [clientIP, utmData]);
 
   return (
     <UTMContext.Provider value={{ utmData, clientIP }}>
@@ -38,4 +63,10 @@ export function UTMProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export const useUTMContext = () => useContext(UTMContext);
+export const useUTMContext = () => {
+  const context = useContext(UTMContext);
+  if (!context) {
+    throw new Error('useUTMContext deve ser usado dentro de um UTMProvider');
+  }
+  return context;
+};
