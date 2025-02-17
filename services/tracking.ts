@@ -9,22 +9,42 @@ export interface TrackingParams {
   sck?: string | null;
 }
 
+// Função para obter IP do cliente
+async function getClientIP(): Promise<string | null> {
+  try {
+    const response = await fetch('https://api.ipify.org?format=json');
+    const data = await response.json();
+    return data.ip;
+  } catch (error) {
+    console.error('Erro ao obter IP:', error);
+    return null;
+  }
+}
+
 // Função para buscar UTMs da API
 export async function getTrackingParams(): Promise<TrackingParams> {
   if (typeof window === 'undefined') return {};
 
   try {
-      const response = await fetch('https://6rc6t6tt-8010.brs.devtunnels.ms/api/tracking/get-utms');
-      const data = await response.json();
+    // Primeiro obtém o IP
+    const clientIP = await getClientIP();
+    if (!clientIP) {
+      console.log('IP não encontrado');
+      return {};
+    }
 
-      if (data.success && data.found && data.data) {
-          // Remove o timestamp e retorna apenas os parâmetros UTM
-          const { timestamp, ...utmParams } = data.data;
-          console.log('UTMs encontradas:', utmParams);
-          return utmParams;
-      }
+    // Depois busca as UTMs usando o IP
+    const response = await fetch(`https://6rc6t6tt-8010.brs.devtunnels.ms/api/tracking/get-utms?ip=${clientIP}`);
+    const data = await response.json();
+
+    if (data.success && data.found && data.data) {
+      // Remove o timestamp e retorna apenas os parâmetros UTM
+      const { timestamp, ...utmParams } = data.data;
+      console.log('UTMs encontradas:', utmParams);
+      return utmParams;
+    }
   } catch (error) {
-      console.error('Erro ao buscar UTMs:', error);
+    console.error('Erro ao buscar UTMs:', error);
   }
 
   return {};
@@ -36,7 +56,7 @@ export async function persistTrackingParams() {
   
   const params = await getTrackingParams();
   if (Object.values(params).some(value => value)) {
-      sessionStorage.setItem('tracking_params', JSON.stringify(params));
+    sessionStorage.setItem('tracking_params', JSON.stringify(params));
   }
 }
 
@@ -46,11 +66,11 @@ export function getPersistedTrackingParams(): TrackingParams {
 
   const stored = sessionStorage.getItem('tracking_params');
   if (stored) {
-      try {
-          return JSON.parse(stored);
-      } catch {
-          return {};
-      }
+    try {
+      return JSON.parse(stored);
+    } catch {
+      return {};
+    }
   }
   return {};
 }
