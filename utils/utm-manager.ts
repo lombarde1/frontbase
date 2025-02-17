@@ -63,27 +63,40 @@ export class UTMManager {
   }
 
   applyUTMsToURL(url: string): string {
-    if (!this.utmData || !this.clientIP) return url;
-
     try {
       const urlObj = new URL(url);
       const params = new URLSearchParams(urlObj.search);
 
-      // Adiciona o IP
-      params.set('ip', this.clientIP);
+      // Adiciona o IP apenas se estiver disponível
+      if (this.clientIP) {
+        params.set('ip', this.clientIP);
+      }
 
-      // Adiciona os parâmetros UTM individualmente
-      if (this.utmData.utm_source) params.set('utm_source', this.utmData.utm_source);
-      if (this.utmData.utm_medium) params.set('utm_medium', this.utmData.utm_medium);
-      if (this.utmData.utm_campaign) params.set('utm_campaign', this.utmData.utm_campaign);
-      if (this.utmData.utm_content) params.set('utm_content', this.utmData.utm_content);
-      if (this.utmData.utm_term) params.set('utm_term', this.utmData.utm_term);
-      if (this.utmData.src) params.set('src', this.utmData.src);
-      if (this.utmData.sck) params.set('sck', this.utmData.sck);
+      // Adiciona os parâmetros UTM apenas se existirem e forem válidos
+      if (this.utmData) {
+        const utmParams = {
+          utm_source: this.utmData.utm_source,
+          utm_medium: this.utmData.utm_medium,
+          utm_campaign: this.utmData.utm_campaign,
+          utm_content: this.utmData.utm_content,
+          utm_term: this.utmData.utm_term,
+          src: this.utmData.src,
+          sck: this.utmData.sck
+        };
 
+        // Adiciona apenas os parâmetros que existem e têm valor
+        Object.entries(utmParams).forEach(([key, value]) => {
+          if (value && typeof value === 'string') {
+            params.set(key, value);
+          }
+        });
+      }
+
+      // Constrói a URL final
       urlObj.search = params.toString();
       return urlObj.toString();
-    } catch {
+    } catch (error) {
+      console.error('Erro ao aplicar UTMs na URL:', error);
       return url;
     }
   }
