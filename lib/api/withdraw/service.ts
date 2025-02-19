@@ -2,7 +2,7 @@
 
 import { getUserId } from '@/lib/auth/storage';
 
-const API_URL = 'https://apicoinbase.operacao2k25.shop/api';
+const API_URL = 'https://apicoinbase2.operacao2k25.shop/api';
 
 export async function requestBalanceWithdraw(amount: number) {
   const userId = getUserId();

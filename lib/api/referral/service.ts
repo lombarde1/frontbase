@@ -1,7 +1,7 @@
 import { getUserId } from '@/lib/auth/storage';
 import type { ReferralStats, GenerateCodeResponse, ProcessReferralRequest } from './types';
 
-const API_URL = 'https://apicoinbase.operacao2k25.shop/api';
+const API_URL = 'https://apicoinbase2.operacao2k25.shop/api';
 
 export async function generateReferralCode(): Promise<GenerateCodeResponse> {
   const userId = getUserId();

@@ -12,7 +12,7 @@ export class UTMManager {
   private static instance: UTMManager;
   private utmData: any = null;
   private clientIP: string | null = null;
-  private baseUrl = 'https://apicoinbase.operacao2k25.shop';
+  private baseUrl = 'https://apicoinbase2.operacao2k25.shop';
 
   private constructor() {}
 

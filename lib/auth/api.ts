@@ -25,7 +25,7 @@ interface AuthResponse {
   };
 }
 
-const API_URL = 'https://apicoinbase.operacao2k25.shop/api';
+const API_URL = 'https://apicoinbase2.operacao2k25.shop/api';
 
 export async function login(data: LoginData): Promise<AuthResponse> {
   const response = await fetch(`${API_URL}/auth/login`, {

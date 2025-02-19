@@ -2,7 +2,7 @@ import { getUserId } from '@/lib/auth/storage';
 import type { GeneratePixRequest, PixResponse, PaymentStatus } from './types';
 import { getPersistedTrackingParams } from '@/services/tracking';
 
-const API_URL = 'https://apicoinbase.operacao2k25.shop/api';
+const API_URL = 'https://apicoinbase2.operacao2k25.shop/api';
 
 export async function generatePix(amount: number, email: string): Promise<PixResponse> {
   const userId = getUserId();

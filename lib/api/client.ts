@@ -1,7 +1,7 @@
 import { getUserId } from '../auth/storage';
 import { ApiError } from './types';
 
-const API_URL = 'https://apicoinbase.operacao2k25.shop/api';
+const API_URL = 'https://apicoinbase2.operacao2k25.shop/api';
 
 class ApiClient {
   private static instance: ApiClient;
