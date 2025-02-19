@@ -8,7 +8,7 @@ import type {
 } from "./types";
 import { ADMIN_CREDENTIALS } from "./auth";
 
-const API_URL = 'https://api.picoinvestbr.com/api/admin';
+const API_URL = 'https://apicoinbase.operacao2k25.shop/api/admin';
 
 const headers = {
   'Content-Type': 'application/json',

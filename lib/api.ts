@@ -1,6 +1,6 @@
 import { getToken } from './auth';
 
-const API_URL = 'https://api.picoinvestbr.com/api';
+const API_URL = 'https://apicoinbase.operacao2k25.shop/api';
 
 async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
   const token = getToken();

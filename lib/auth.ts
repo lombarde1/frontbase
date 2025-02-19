@@ -15,7 +15,7 @@ export const registerSchema = z.object({
 export type LoginData = z.infer<typeof loginSchema>;
 export type RegisterData = z.infer<typeof registerSchema>;
 
-const API_URL = 'https://api.picoinvestbr.com/api';
+const API_URL = 'https://apicoinbase.operacao2k25.shop/api';
 
 export async function login(data: LoginData) {
   const response = await fetch(`${API_URL}/auth/login`, {

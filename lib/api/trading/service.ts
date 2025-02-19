@@ -1,6 +1,6 @@
 import { getUserId } from '@/lib/auth/storage';
 
-const API_URL = 'https://api.picoinvestbr.com/api';
+const API_URL = 'https://apicoinbase.operacao2k25.shop/api';
 
 export async function buyCrypto(symbol: string, amount: number) {
   const userId = getUserId();
